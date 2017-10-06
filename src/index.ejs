@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>EasyWifiWindows</title>
+    <link rel="stylesheet" type="text/css" href="/static/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/roboto/css/roboto.css">
+    <link rel="stylesheet" type="text/css" href="/static/md-font/icon.css">
+    <link rel="stylesheet" type="text/css" href="/static/md-font/material-icons.css">
+    <link rel="stylesheet" type="text/css" href="/static/vuetify/vuetify.min.css">
+    <% if (htmlWebpackPlugin.options.nodeModules) { %>
+    <!-- Add `node_modules/` to global paths so `require` works properly in development -->
+    <script>
+        require('module').globalPaths.push('<%= htmlWebpackPlugin.options.nodeModules.replace(/\\/g, '\\\\') %>')
+    </script>
+    <% } %>
+    <style>
+        html{
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body style="
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: default;"
+
+
+>
+<div id="app"></div>
+<!-- Set `__static` path to static files in production -->
+<script>
+    if (process.env.NODE_ENV !== 'development') window.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
+</script>
+<script src="/static/vuetify/vuetify.min.js"></script>
+<!-- webpack builds are automatically injected -->
+</body>
+</html>
