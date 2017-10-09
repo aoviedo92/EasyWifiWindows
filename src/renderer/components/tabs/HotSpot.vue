@@ -60,6 +60,7 @@
     let windows1252 = require('windows-1252');
     let storedData;
     const fileData = './datastored.json';
+    import netsh from '../../netsh'
     //    wifiSecuritySettings
     export default {
         name: 'hot-spot',
@@ -95,22 +96,26 @@
             starWifi(){
                 console.log('starWifi');
                 return new Promise((resolve, reject) => {
-                    let cmd = 'netsh wlan start hostednetwork';
-                    console.info(cmd);
-                    const starWifiCmd = exec(cmd, {encoding: 'utf-8'}, (err, stdout, stderr) => {
-                        err && reject(windows1252.decode(stdout));
-//                        stderr && console.error('stderr', stderr);
-//                        console.log('stdout', windows1252.encode(stdout));
+                    netsh.startWifi((err, stdout, stderr) => {
+                        this.loading = false;
+                        if(err) return reject(windows1252.decode(stdout));
+                        this.wifiStatus = 1;
                         resolve(stdout)
                     });
-                    starWifiCmd.on('close', (code) => {
-                        console.log('child process exited with code ' + code);
-                        this.loading = false;
-
-                        if (code === 0){
-                            this.wifiStatus = 1;
-                        }
-                    });
+//                    let cmd = 'netsh wlan start hostednetwork';
+//                    console.info(cmd);
+//                    const starWifiCmd = exec(cmd, {encoding: 'utf-8'}, (err, stdout, stderr) => {
+//                        stderr && console.error('stderr', stderr);
+//                        console.log('stdout', windows1252.encode(stdout));
+//                    });
+//                    starWifiCmd.on('close', (code) => {
+//                        console.log('child process exited with code ' + code);
+//                        this.loading = false;
+//
+//                        if (code === 0){
+//                            this.wifiStatus = 1;
+//                        }
+//                    });
                 })
             },
             enableWifi(){
@@ -118,16 +123,24 @@
                 return new Promise((resolve, reject) => {
                     if (!this.statusNotAvailable && !this.passwordChanged && !this.ssidChanged)
                         return resolve();
-                    let cmd = `netsh wlan set hostednetwork mode=allow ssid=${this.ssid} key=${this.password}`
-                    console.info(cmd);
-                    exec(cmd, (err, stdout, stderr) => {
+                    netsh.enableWifi(this.ssid, this.password, (err, stdout) => {
                         if (err) {
-                            reject(err);
+                            return reject(err);
                         }
                         this.passwordChanged = false;
                         this.ssidChanged = false;
                         resolve(stdout)
-                    })
+                    });
+//                    let cmd = `netsh wlan set hostednetwork mode=allow ssid=${this.ssid} key=${this.password}`
+//                    console.info(cmd);
+//                    exec(cmd, (err, stdout, stderr) => {
+//                        if (err) {
+//                            reject(err);
+//                        }
+//                        this.passwordChanged = false;
+//                        this.ssidChanged = false;
+//                        resolve(stdout)
+//                    })
                 })
             },
             initWifi(){
@@ -144,27 +157,35 @@
                 })
             },
             stopWifi(){
-                console.log('detener wifi');
                 this.loading = true;
-                let cmd = 'netsh wlan stop hostednetwork';
-                console.info(cmd);
-                let stopWifiCmd = exec(cmd, (err, stdout, stderr) => {
-                    if (err){
-                        console.error(err);
-                        this.snackBar('error', err, 12000)
-                    }else {
-                        console.log(stdout);
-                        this.snackBar('success', stdout)
-                    }
-                });
-                stopWifiCmd.on('close', (code) => {
-                    console.log('child process exited with code ' + code);
+                netsh.stopWifi((err, stdout, stderr) => {
+                    if (err) return this.snackBar('error', err, 12000);
+                    console.log(err, stdout);
+                    this.snackBar('success', stdout);
+                    this.wifiStatus = 0;
                     this.loading = false;
-
-                    if (code === 0){
-                        this.wifiStatus = 0;
-                    }
                 });
+//                console.log('detener wifi');
+//                this.loading = true;
+//                let cmd = 'netsh wlan stop hostednetwork';
+//                console.info(cmd);
+//                let stopWifiCmd = exec(cmd, (err, stdout, stderr) => {
+//                    if (err){
+//                        console.error(err);
+//                        this.snackBar('error', err, 12000)
+//                    }else {
+//                        console.log(stdout);
+//                        this.snackBar('success', stdout)
+//                    }
+//                });
+//                stopWifiCmd.on('close', (code) => {
+//                    console.log('child process exited with code ' + code);
+//                    this.loading = false;
+//
+//                    if (code === 0){
+//                        this.wifiStatus = 0;
+//                    }
+//                });
             },
             snackBar(context, msg, timeout=6000){
                 this.snackbar.context = context;

@@ -107,4 +107,22 @@ export default {
             });
         });
     },
+    enableWifi(ssid, password, cb) {
+        exec(`netsh wlan set hostednetwork mode=allow ssid=${ssid} key=${password}`, (err, stdout, stderr) => {
+            debug(err, stderr);
+            return cb(err, stdout, stderr)
+        });
+    },
+    startWifi(cb){
+        exec("netsh wlan start hostednetwork", (err, stdout, stderr) => {
+            debug(err, stdout, stderr);
+            return cb(err, stdout, stderr)
+        })
+    },
+    stopWifi(cb){
+        exec("netsh wlan stop hostednetwork", (err, stdout, stderr) => {
+            debug(err, stdout, stderr);
+            return cb(err, stdout, stderr)
+        })
+    }
 }

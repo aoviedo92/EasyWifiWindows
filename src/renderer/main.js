@@ -125,7 +125,7 @@ function getWifiData() {
         // });
     // });
     netsh.getWifiData(wifi => {
-        console.log('netsh', wifi);
+        console.log('netsh', wifi.status);
         if (Status.NOT_AVAILABLE.indexOf(wifi.status) !== -1) {
             // evento para advertir que la wifi no esta disponible pq no se ha establecido con 'set mode=allow' aun. lo recibe HotSpot
             eventHub.$emit('wifi-status-not-available');
