@@ -18,7 +18,7 @@
                     <v-tabs-content :id="'mobile-tabs-1-info'">
                         <security></security>
                     </v-tabs-content>
-                    <v-tabs-content :id="'mobile-tabs-1-help'"> help </v-tabs-content>
+                    <v-tabs-content :id="'mobile-tabs-1-help'"> <help></help> </v-tabs-content>
                 </v-tabs>
 
             <!--</v-container>-->
@@ -32,10 +32,11 @@
     import TitleBar from './components/TitleBar.vue'
     import HotSpot from './components/tabs/HotSpot.vue'
     import Security from './components/tabs/Security.vue'
+    import Help from './components/tabs/Help.vue'
     import eventHub from './EventHub';
     export default {
         name: 'EasyWifiWindows',
-        components: {TitleBar, HotSpot, Security},
+        components: {TitleBar, HotSpot, Security,Help},
         data () {
             return {
                 active: null,
