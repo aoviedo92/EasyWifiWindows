@@ -1,3 +1,8 @@
+import "../../static/vuetify/vuetify.min.css"
+import "../../static/font-awesome/css/font-awesome.min.css"
+import "../../static/roboto/css/roboto.css"
+import "../../static/md-font/icon.css"
+import "../../static/md-font/material-icons.css"
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import App from './App.vue'
@@ -54,7 +59,6 @@ let PWD_ON_HOTSPOT = false;
  17 : " "
  18 : ""
  */
-
 function getWifiSSID() {
     let cmd = 'netsh wlan show hostednetwork';
     exec(cmd, (err, stdout, stderr) => {
