@@ -12,7 +12,8 @@ if (!process.env.IS_WEB) Vue.use(require('vue-electron'));
 Vue.config.productionTip = false;
 import eventHub from './EventHub';
 
-const exec = require('child_process').exec;
+import netsh from './netsh'
+// const exec = require('child_process').exec;
 const Status = {
     'NOT_AVAILABLE': ['Not available', 'No disponible'],
     'NOT_INIT': ['Not started', 'No iniciado'],
@@ -59,70 +60,100 @@ let PWD_ON_HOTSPOT = false;
  17 : " "
  18 : ""
  */
-function getWifiSSID() {
-    let cmd = 'netsh wlan show hostednetwork';
-    exec(cmd, (err, stdout, stderr) => {
-        console.log('getWifiSSID.err', err);
-        let out = stdout.split('\n');
-        let match1, match2 = false;
+function getWifiData() {
+    // let cmd = 'netsh wlan show hostednetwork';
+    // exec(cmd, (err, stdout, stderr) => {
+    //     console.log('getWifiSSID.err', err);
+    //     let out = stdout.split('\n');
+    //     let match1, match2 = false;
         // let arp;
-        exec('arp -a', (err, stdout, stderr) => {
-            let arp = stdout;
+        // exec('arp -a', (err, stdout, stderr) => {
+        //     let arp = stdout;
             // console.log('arp', arp.substr(90, 100));
             // console.log(arp.split('\n'));
-            let status = out[11].split(':')[1].trim();
+            // let status = out[11].split(':')[1].trim();
             // console.log('status', status);
-            if (Status.NOT_AVAILABLE.indexOf(status) !== -1) {
-                // evento para advertir que la wifi no esta disponible pq no se ha establecido con 'set mode=allow' aun. lo recibe HotSpot
-                eventHub.$emit('wifi-status-not-available');
-                // emitir estado de la wifi. 0/1. lo recibe HotSpot
-                eventHub.$emit('wifi-status', 0);
-                eventHub.$emit('info-cant-clients', 0);
-                eventHub.$emit('info-clients', {})
-            }
-            else if (Status.NOT_INIT.indexOf(status) !== -1) {
-                eventHub.$emit('wifi-status', 0);
-                eventHub.$emit('info-cant-clients', 0);
-                eventHub.$emit('info-clients', {})
-            }
-            else if (Status.INIT.indexOf(status) !== -1) {
-                // console.log('Status.INIT');
-                eventHub.$emit('wifi-status', 1);
-                let cantClients = parseInt(out[15].split(':')[1].trim());
-                // console.log('cantClients', cantClients);
-                let loopUntil = 15 + cantClients;
-                eventHub.$emit('info-cant-clients', cantClients);
-                let clients = {};
-                for (let j = 16; j <= loopUntil; j++) {
-                    let match = out[j].match(/.{2}:.{2}:.{2}:.{2}:.{2}:.{2}/);
-                    if (arp && match.length) {
-                        let mac = match[0].replace(/:/g, '-');
-                        // console.log('mac', mac);
-                        let macIndexInArp = arp.indexOf(mac);
-                        // console.log('macIndexInArp',macIndexInArp);
-                        if (macIndexInArp !== -1) {
-                            clients[mac] = arp.substr(macIndexInArp - 24, 24).trim(); //{mac:ip}
-                            // if(!clients[mac]){
-                            //     clients[mac] = {
-                            //         ip: arp.substr(macIndexInArp - 24, 24).trim(),
-                            //         connectedAt: Date.now()
-                            //     }//{mac: {ip, connectedAt}}
-                            // }
-                        }
-                    }
-
-                }
-                console.log('clients', clients);
-                eventHub.$emit('info-clients', clients)
-            }
-            if (!SSID_ON_HOTSPOT) {
-                let ssid = out[4].split(':')[1].trim().replace(/"/g, '');
-                // emitir nombre de la wifi. lo recibe HotSpot
-                eventHub.$emit('wifi-ssid', ssid);
-                SSID_ON_HOTSPOT = true;
-            }
-        });
-    });
+            // if (Status.NOT_AVAILABLE.indexOf(status) !== -1) {
+            //     // evento para advertir que la wifi no esta disponible pq no se ha establecido con 'set mode=allow' aun. lo recibe HotSpot
+            //     eventHub.$emit('wifi-status-not-available');
+            //     // emitir estado de la wifi. 0/1. lo recibe HotSpot
+            //     eventHub.$emit('wifi-status', 0);
+            //     eventHub.$emit('info-cant-clients', 0);
+            //     eventHub.$emit('info-clients', {})
+            // }
+            // else if (Status.NOT_INIT.indexOf(status) !== -1) {
+            //     eventHub.$emit('wifi-status', 0);
+            //     eventHub.$emit('info-cant-clients', 0);
+            //     eventHub.$emit('info-clients', {})
+            // }
+            // else if (Status.INIT.indexOf(status) !== -1) {
+            //     // console.log('Status.INIT');
+            //     eventHub.$emit('wifi-status', 1);
+            //     let cantClients = parseInt(out[15].split(':')[1].trim());
+            //     // console.log('cantClients', cantClients);
+            //     let loopUntil = 15 + cantClients;
+            //     eventHub.$emit('info-cant-clients', cantClients);
+            //     let clients = {};
+            //     for (let j = 16; j <= loopUntil; j++) {
+            //         let match = out[j].match(/.{2}:.{2}:.{2}:.{2}:.{2}:.{2}/);
+            //         if (arp && match.length) {
+            //             let mac = match[0].replace(/:/g, '-');
+            //             // console.log('mac', mac);
+            //             let macIndexInArp = arp.indexOf(mac);
+            //             // console.log('macIndexInArp',macIndexInArp);
+            //             if (macIndexInArp !== -1) {
+            //                 clients[mac] = arp.substr(macIndexInArp - 24, 24).trim(); //{mac:ip}
+            //                 // if(!clients[mac]){
+            //                 //     clients[mac] = {
+            //                 //         ip: arp.substr(macIndexInArp - 24, 24).trim(),
+            //                 //         connectedAt: Date.now()
+            //                 //     }//{mac: {ip, connectedAt}}
+            //                 // }
+            //             }
+            //         }
+            //
+            //     }
+            //     console.log('clients', clients);
+            //     eventHub.$emit('info-clients', clients)
+            // }
+            // if (!SSID_ON_HOTSPOT) {
+            //     let ssid = out[4].split(':')[1].trim().replace(/"/g, '');
+            //     // emitir nombre de la wifi. lo recibe HotSpot
+            //     eventHub.$emit('wifi-ssid', ssid);
+            //     SSID_ON_HOTSPOT = true;
+            // }
+        // });
+    // });
+    netsh.getWifiData(wifi => {
+        console.log('netsh', wifi);
+        if (Status.NOT_AVAILABLE.indexOf(wifi.status) !== -1) {
+            // evento para advertir que la wifi no esta disponible pq no se ha establecido con 'set mode=allow' aun. lo recibe HotSpot
+            eventHub.$emit('wifi-status-not-available');
+            // emitir estado de la wifi. 0/1. lo recibe HotSpot
+            eventHub.$emit('wifi-status', 0);
+            eventHub.$emit('info-cant-clients', 0);
+            eventHub.$emit('info-clients', {})
+        }else if (Status.NOT_INIT.indexOf(wifi.status) !== -1) {
+            eventHub.$emit('wifi-status', 0);
+            eventHub.$emit('info-cant-clients', 0);
+            eventHub.$emit('info-clients', {})
+        }else if (Status.INIT.indexOf(wifi.status) !== -1) {
+            eventHub.$emit('wifi-status', 1);
+            eventHub.$emit('info-cant-clients', wifi.cantClients);
+            eventHub.$emit('info-clients', wifi.clients);
+        }
+        eventHub.$emit('info-authentication', wifi.authentication);
+        eventHub.$emit('info-cipher', wifi.cipher);
+        if (!SSID_ON_HOTSPOT) {
+            // emitir nombre de la wifi. lo recibe HotSpot
+            eventHub.$emit('wifi-ssid', wifi.ssid);
+            SSID_ON_HOTSPOT = true;
+        }
+        if (!PWD_ON_HOTSPOT){
+            eventHub.$emit('wifi-password', wifi.password);
+            PWD_ON_HOTSPOT = true;
+        }
+    })
 }
 
 /**
@@ -138,42 +169,40 @@ function getWifiSSID() {
  8 : " "
  9 : ""
  */
-function getWifiPwd() {
-    let cmd = 'netsh wlan show hostednetwork setting=security';
-    exec(cmd, (err, stdout, stderr) => {
-        let out = stdout.split('\n');
-        // console.log(out);
-        let authentication = out[3].split(':')[1].trim();
-        eventHub.$emit('info-authentication', authentication);
-        // console.log('authentication',authentication);
-        let cipher = out[4].split(':')[1].trim();
-        // console.log('cipher', cipher);
-        eventHub.$emit('info-cipher', cipher);
-        let password = out[6].split(':')[1].trim();
-        eventHub.$emit('wifi-password', password);
-        // for (let i = 0; i < out.length; i++) {
-        //     let match = /----------/.test(out[i]);
-        //     let match1 = false;
-        //     if (!PWD_ON_HOTSPOT)
-        //         if (match && !match1) {
-        //             match1 = true;
-        //             let password = out[i + 4].split(':')[1].trim();
-                    // emitir password de la wifi. lo recibe HotSpot
-                    // PWD_ON_HOTSPOT = true;
-                // }
-        // }
-    })
-}
+// function getWifiPwd() {
+//     let cmd = 'netsh wlan show hostednetwork setting=security';
+//     exec(cmd, (err, stdout, stderr) => {
+//         let out = stdout.split('\n');
+//         // console.log(out);
+//         let authentication = out[3].split(':')[1].trim();
+//         eventHub.$emit('info-authentication', authentication);
+//         // console.log('authentication',authentication);
+//         let cipher = out[4].split(':')[1].trim();
+//         // console.log('cipher', cipher);
+//         eventHub.$emit('info-cipher', cipher);
+//         let password = out[6].split(':')[1].trim();
+//         eventHub.$emit('wifi-password', password);
+//         // for (let i = 0; i < out.length; i++) {
+//         //     let match = /----------/.test(out[i]);
+//         //     let match1 = false;
+//         //     if (!PWD_ON_HOTSPOT)
+//         //         if (match && !match1) {
+//         //             match1 = true;
+//         //             let password = out[i + 4].split(':')[1].trim();
+//                     // emitir password de la wifi. lo recibe HotSpot
+//                     // PWD_ON_HOTSPOT = true;
+//                 // }
+//         // }
+//     })
+// }
 
 new Vue({
     components: {App},
     template: '<App/>',
     mounted() {
-        getWifiPwd();
-        getWifiSSID();
+        getWifiData();
         setInterval(() => {
-            getWifiPwd();
-            getWifiSSID()
+            getWifiData()
         }, 5000);
     }
 }).$mount('#app');
