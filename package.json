@@ -1,8 +1,8 @@
 {
   "name": "EasyWifiWindows",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "author": "Adrian Oviedo <adrian.oviedo.1992@gmail.com>",
-  "description": "EasyWifiWindows 1.0",
+  "description": "Controla facilmente la red hospedada de Windows",
   "license": null,
   "main": "./dist/electron/main.js",
   "scripts": {
@@ -31,7 +31,7 @@
       "dist/electron/**/*"
     ],
     "forceCodeSigning": false,
-    "electronDist": "D:/tools/Development/node/electron-v1.7.4-win32-ia32",
+    "electronDist": "D:/tools/Development/node/electron-v1.8.0-win32-ia32",
     "dmg": {
       "contents": [
         {
