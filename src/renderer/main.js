@@ -149,18 +149,19 @@ function getWifiPwd() {
         let cipher = out[4].split(':')[1].trim();
         // console.log('cipher', cipher);
         eventHub.$emit('info-cipher', cipher);
-        for (let i = 0; i < out.length; i++) {
-            let match = /----------/.test(out[i]);
-            let match1 = false;
-            if (!PWD_ON_HOTSPOT)
-                if (match && !match1) {
-                    match1 = true;
-                    let password = out[i + 4].split(':')[1].trim();
+        let password = out[6].split(':')[1].trim();
+        eventHub.$emit('wifi-password', password);
+        // for (let i = 0; i < out.length; i++) {
+        //     let match = /----------/.test(out[i]);
+        //     let match1 = false;
+        //     if (!PWD_ON_HOTSPOT)
+        //         if (match && !match1) {
+        //             match1 = true;
+        //             let password = out[i + 4].split(':')[1].trim();
                     // emitir password de la wifi. lo recibe HotSpot
-                    eventHub.$emit('wifi-password', password);
-                    PWD_ON_HOTSPOT = true;
-                }
-        }
+                    // PWD_ON_HOTSPOT = true;
+                // }
+        // }
     })
 }
 
