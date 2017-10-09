@@ -45,6 +45,7 @@ function getWifiData() {
         if (!SSID_ON_HOTSPOT) {
             // emitir nombre de la wifi. lo recibe HotSpot
             eventHub.$emit('wifi-ssid', wifi.ssid);
+            eventHub.$emit('stop-loading-hot-spot');
             SSID_ON_HOTSPOT = true;
         }
         if (!PWD_ON_HOTSPOT){

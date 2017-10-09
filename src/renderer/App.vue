@@ -11,13 +11,16 @@
                         <v-tabs-slider></v-tabs-slider>
                     </v-tabs-bar>
                     <v-tabs-content :id="'mobile-tabs-1-hotspot'" class="bc0">
-                        <hot-spot></hot-spot>
+                        <v-progress-linear v-bind:indeterminate="true" v-show="loadingHotSpot" error height="5" style="margin-top: 0"></v-progress-linear>
+
+                        <hot-spot v-show="!loadingHotSpot"></hot-spot>
                     </v-tabs-content>
                     <v-tabs-content :id="'mobile-tabs-1-info'">
                         <security></security>
                     </v-tabs-content>
                     <v-tabs-content :id="'mobile-tabs-1-help'"> help </v-tabs-content>
                 </v-tabs>
+
             <!--</v-container>-->
         </main>
 
@@ -37,9 +40,13 @@
             return {
                 active: null,
                 cantUsers: 0,
+                loadingHotSpot: true,
             }
         },
         mounted(){
+            eventHub.$on('stop-loading-hot-spot', () => {
+                this.loadingHotSpot = false;
+            });
             eventHub.$on('info-cant-clients', cantClients => {
                 this.cantUsers = cantClients;
             })
