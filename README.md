@@ -1,6 +1,6 @@
-# my-project
+# Easy Wifi Windows
 
-> An electron-vue project
+> Controla facilmente la red hospedada de Windows
 
 #### Build Setup
 
